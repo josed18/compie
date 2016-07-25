@@ -30,8 +30,6 @@ public class semantico extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         jTextArea1 = new javax.swing.JTextArea();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-
         jTextArea1.setColumns(20);
         jTextArea1.setRows(5);
         jScrollPane1.setViewportView(jTextArea1);
@@ -50,10 +48,11 @@ public class semantico extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 207, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(82, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     /**
@@ -90,35 +89,105 @@ public class semantico extends javax.swing.JFrame {
             }
         });
     }
+    String salida;
     void execute(String txt)
     {
         this.setVisible(true);
-              
-        //declarar arreglos contenedores
-        int all=1000;
-        int sum[][]=new int[6][all];
-        String todo[][]=new String[6][all];
-        int lens[]=new int[6];
+        salida = "";
+        txt = quitarComentarios(txt);
+	verificarInicoYFin(txt);
+	verificarNombrePrograma(txt);
+	mostrar();
+    }
+     
+    public void mostrar(){
+	if(salida.equals(""))
+	{   jTextArea1.setText("Sin errores semantico");
+	}
+	else{
+	jTextArea1.setText(salida);
+	}
+    }
+    
+    public void verificarInicoYFin(String contenido){
+	String conte = quitarNombre(contenido).replaceFirst("programa","").replace(" ","").replace("\n","");
+	if(!contenido.contains("inicio")){
+	    salida+="falta sentencia \"inicio\"\n";
+	}
+	    else{
+		    if(!conte.startsWith("inicio"))
+		    {   salida+="contenido antes de sentencia \"inicio\"\n";
+		    }
+	    }
+	if(!contenido.replace("mmattfin","").contains("fin")){
+	    salida+="falta sentencia \"fin\"\n";
+	    
+	}
+	    else{
+		    if(!conte.replace("mmattfin","").endsWith("fin"))
+		    {   salida+="contenido despues de sentencia \"fin\"\n";
+		    }
+	    }
+    }
+    
+    public void verificarNombrePrograma(String contenido){
+	contenido = contenido.replace(" ","").replace("\n","");
+	if(contenido.contains("programa")){
+	    if(!contenido.startsWith("programa"))
+	    {	salida+="declaracion del nombre del programa fuera de lugar\n";
+	    }
+	}
+	else{	salida+="declaracion del nombre del programa inexistente\n";
+	}
+    }
+    
+    
+    
+    
+    public String quitarNombre(String contenido){
+	int posNombre = contenido.indexOf("programa");
+        String part1 = contenido.substring(0,(posNombre+8));
+        String part2 = contenido.substring(contenido.indexOf("\n",posNombre)+1,contenido.length());
+        return part1+part2; 
+    }
+    
+    public String quitarComentarios(String contenido)
+    {
+	String commentario = "\\\\";
+        String inicio_commentario= "\\*";
+        String fin_commentario = "*\\";
+        int pos = 0;
+        while(pos != -1){
+            pos = contenido.indexOf(commentario);
+            if(pos != -1){
+                int pos2 = contenido.indexOf("\n", pos);
+                if(pos2 == -1){
+                    contenido = contenido.substring(0, pos);
+                    continue;
+                }
+                String inico = contenido.substring(0, pos);
+                String fin = contenido.substring(pos2, contenido.length());
+                contenido = inico + fin;
+                continue;
+            }
+            pos = contenido.indexOf(inicio_commentario);
+            if(pos != -1){
+                int pos2 = contenido.indexOf(fin_commentario, pos);
+                if(pos2 == -1){
+                    contenido = contenido.substring(0, pos);
+                    continue;
+                }else{
+                    String inicio = contenido.substring(0, pos);
+                    String fin = contenido.substring(pos2+2, contenido.length());
+                    contenido = inicio + fin;
+                    continue; 
+                }
                 
-        //mostrar string sin espacios
-        txt=txt.replaceAll("\\s"," ");
-        txt=txt.replaceAll("  "," ");
-        String[] palabras = txt.split(" "); 
-        txt=txt.toLowerCase();
-        jTextArea1.setText(txt+"\n\n");
-        int cant=txt.length();
-        
-        
-        for(int a=0;a<palabras.length;a+=1)
-        {
-            palabras[a]=palabras[a].replaceAll("\\s","");
-            if(palabras[a].length()>0){
-            //jComboBox1.addItem(palabras[a]);
             }
         }
-    }
-            
-
+	return contenido;
+      } 
+ 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextArea jTextArea1;
