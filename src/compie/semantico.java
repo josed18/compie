@@ -5,6 +5,8 @@
  */
 package compie;
 
+import java.util.ArrayList;
+
 /**
  *
  * @author PrinterU
@@ -97,6 +99,8 @@ public class semantico extends javax.swing.JFrame {
         txt = quitarComentarios(txt);
 	verificarInicoYFin(txt);
 	verificarNombrePrograma(txt);
+        VerificarDeclaracionYExpreciones(txt);
+        ExtraerVariables(txt);
 	mostrar();
     }
      
@@ -142,7 +146,29 @@ public class semantico extends javax.swing.JFrame {
     }
     
     
+    public void VerificarDeclaracionYExpreciones(String Contenido){
+        int ultDeclarar = 0;
+        while(Contenido.indexOf("declarar", ultDeclarar+1)!=-1){
+            ultDeclarar = Contenido.indexOf("declarar", ultDeclarar+1);
+        }
+        if(Contenido.indexOf("mmatini")<ultDeclarar){
+            salida+="declaracion de variables despues de expresiones\n";
+        }
+    }
     
+    
+    ArrayList<String> Variables = new ArrayList<>();
+    
+    public void ExtraerVariables(String Contenido){
+        String[] variables = Contenido.split("\n");
+        for (String variable : variables){
+            if(variable.trim().startsWith("declarar")){
+                variable = variable.replaceAll("declarar", "");
+                Variables.add(variable.trim());
+            }
+        }
+        
+    }
     
     public String quitarNombre(String contenido){
 	int posNombre = contenido.indexOf("programa");
